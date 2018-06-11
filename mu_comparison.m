@@ -4,7 +4,9 @@ clear;
 clc;
 close all;
 
-raw_SPs = csvread("SP_cplx_V00_R02.csv");
+%% Mu stability factor assessment
+
+raw_SPs = csvread("./Sparams/Sparams_complex_c.csv");
 
 % Creates a 3D matrix of 2x2xlenght(raw_SPs)
 SP_sample_size = length(raw_SPs);
@@ -18,21 +20,31 @@ end
 
 % Creates a frequency vector
 frequency = [1E9:80E6:5E9];
-%S11 = raw_SPs(1,:);
-%S12 = raw_SPs(2,:);
-%S21 = raw_SPs(3,:);
-%S22 = raw_SPs(4,:);
-%plot(frequency,S11);
-%hold on;
-%plot(frequency,S12);
-%plot(frequency,S21);
-%plot(frequency,S22);
 
-% MATLAB ONLY
+% Loads under test parameters
+mu_spm = csvread("./Sparams/mu_spm_a.csv");
+mu_aasp = csvread("./Sparams/muasspm_a.csv");
+
 [mu, mu_prime] = stabilitymu(SP);
+
+figure(1);
 plot(frequency, mu);
 hold on;
+plot(frequency, mu_spm);
+plot(frequency, mu_aasp);
+legend('Mu by Matlab','Mu by spm','Mu by aasp','Location','southwest');
 
-mubyBL = csvread("mubyBL.csv");
-plot(frequency, mubyBL);
-legend('Mu by Matlab','Mu by BL','Location','southwest');
+%% K stability factor assessment
+
+Kstd = csvread("./Sparams/Kstd_a.csv");
+K_spm_a = csvread("./Sparams/K_spm_a.csv");
+
+[K, B1, B2, Delta] = stabilityk(SP);
+
+figure(2);
+plot(frequency, K);
+hold on;
+plot(frequency, Kstd);
+plot(frequency, K_spm_a);
+
+legend('K by Matlab','K by Cadence','K by hand','Location','southwest');
